@@ -1,0 +1,66 @@
+
+.game {
+  height: 500px;
+  width: 600px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  margin-top: 30px;
+  background: rgb(111,	134,	199);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.column {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  
+}
+
+.slot {
+  margin: 2px;
+  border-radius: 50px;
+  background-color: white;
+  flex: 1 1 auto;
+  margin: 0.5em;
+}
+
+.slot:hover {
+  background-color: #fffefe;
+}
+
+.game.is-win .slot {
+  pointer-events: none;
+}
+
+.player1 {
+  background-color: rgb(191,	61,	54);
+}
+.player1.slot:hover {
+  background-color: rgb(191,	61,	54);
+}
+
+.player2 {
+    background-color: #1b262c;
+}
+.player2.slot:hover {
+    background-color: #1b262c;
+
+}
+
+
+.win {
+  position: absolute;
+}
+
+.score {
+  text-align: left;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  border: 1px solid black;
+  padding: 1rem;
+}
