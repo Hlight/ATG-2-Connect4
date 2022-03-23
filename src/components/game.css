@@ -26,6 +26,7 @@
   background-color: white;
   flex: 1 1 auto;
   margin: 0.5em;
+  border: 1px solid #4a66b8;
 }
 
 .slot:hover {
@@ -52,8 +53,13 @@
 }
 
 
-.win {
+.win-reset {
   position: absolute;
+  bottom: -2rem;
+  width: 620px;
+}
+.win-reset button {
+  width: 100%;
 }
 
 .score {
@@ -63,4 +69,9 @@
   left: 1rem;
   border: 1px solid black;
   padding: 1rem;
+}
+
+.btn-reset {
+  position: fixed;
+  bottom: 0;
 }

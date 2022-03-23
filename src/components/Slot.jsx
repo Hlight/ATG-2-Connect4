@@ -15,7 +15,7 @@ export default function Slot({
       case 2:
         return <div className="slot player2"></div>
       default:
-        return <div onClick={handleClick} className="slot default"></div> 
+        return <div onClick={handleClick} className="slot default">{/*coordinates[0]},{coordinates[1]*/}</div> 
     }
   };
   

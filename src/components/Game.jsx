@@ -12,14 +12,14 @@ import {
 import classNames from "classnames";
 import "./game.css";
 
-// The following tutorial was used throughout this app.  Mainly the matrix algorithms.
-// https://betterprogramming.pub/how-to-make-connect-4-with-react-html-and-css-ec60078ca7fd
-
 export default function Game() {
   const [board, setBoard] = useState([]);
   const [started, setStarted] = useState(false);
   const [winDisplay, setWinDisplay] = useState("");
-
+  const [showModal, setShowModal] = useState(false);
+  const [isOnePlayer, setIsOnePlayer] = useState(false);
+  const [showPlayersModal, setShowPlayersModal] = useState(true);
+  
   const model = useRef(null);
   const turn = useRef(1);
   const win = useRef(false);
@@ -131,9 +131,11 @@ export default function Game() {
   const checkHorizontal = (coordinates, player) => {
     let counter = 0
     while (true) {
+      // once at the end of game columns break
       if(coordinates[0] + counter + 1 === 7){
         break;
-      } 
+      }
+      // number of horizontal splots to board end
       counter += 1;
     }
   
@@ -180,11 +182,14 @@ export default function Game() {
   const checkDiagonalUp = (coordinates, player) => {  
     let counter = 0;
     while (true) {
+      // check if at board column end
       if (coordinates[0] + counter + 1 === 7) {
         break;
+      // check if at slots end
       } else if (coordinates[1] + counter + 1 === 6) {
         break;
       }
+      // number of diagonalUp slots til board end
       counter += 1;
     }
 
@@ -281,29 +286,29 @@ export default function Game() {
     let playerText = "";
     if (player === 1) {
       playerText = "Red";
-      turn.current = turn.current === 1 ? 2 : 1;
+      if (!isOnePlayer) {
+        turn.current = turn.current === 1 ? 2 : 1;
+      }
       score.current.player1 += 1;
     } else if (player === 2) {
       playerText = "Black";
       score.current.player2 += 1;
-      turn.current = turn.current === 2 ? 1 : 2;
+      if (!isOnePlayer) {
+        turn.current = turn.current === 2 ? 1 : 2;
+      }
     }
     win.current = true;
+    setShowModal(true);
     setWinDisplay(
       <div className={classNames("winner", {
         "win-player1": player === 1,
         "win-plaery2": player === 2
       })}>{`${playerText} Won the game! `}
-        <Button
-          variant="contained"
-          onClick={() => {
-            createGameBoardModel();
-            createGameBoard();
-            setWinDisplay("");
-            win.current = false;
-          }}>Reset</Button>
       </div>
     );
+    if (isOnePlayer) {
+      turn.current = 1;
+    }
    };
  
   const dropper = (coordinates) => {
@@ -332,6 +337,39 @@ export default function Game() {
         turn.current = turn.current === 1 ? 2 : 1;
     }
    };
+
+  // computer player logic (pretty dumb atm)
+  useEffect(() => {
+    if (isOnePlayer && turn.current === 2) {
+      let xCoord = Math.floor(Math.random() * 6);
+      let yCoord = Math.floor(Math.random() * 5);
+      for (let x=0; x<7; x++) {
+        for (let y=0; y<6; y++) {
+          if (model.current[x][y] === 2) {
+            xCoord = x;
+            yCoord = y;
+            
+            if (x-1!==-1 && model.current[x-1][y] === 0) {
+              xCoord = x-1;
+            } 
+            if (y-1!==-1 && model.current[x][y-1] === 0) {
+              yCoord = y-1;
+            }
+            if (x+1!==7 && model.current[x+1][y] === 0) {
+              xCoord = x+1;
+            }
+            if (y+1!==6 && model.current[x][y+1] === 0) {
+              yCoord = y+1;
+            }
+          } 
+        }
+      }
+      dropper([xCoord,yCoord]);
+      console.log("computer turn!");
+    }
+  }, [turn.current]);
+
+  
   
   return (
     <>
@@ -339,13 +377,26 @@ export default function Game() {
         Red: {score.current.player1}<br />
         Black: {score.current.player2}
       </div>
-      <div className="win">{winDisplay}</div>
+
       <div className={classNames("game", {
         "is-win": win.current
       })}>{board}</div>
+      <div className="win-reset">
+        {win.current && (
+          <Button
+            variant="contained"
+            className="btn-reset"
+            onClick={() => {
+              createGameBoardModel();
+              createGameBoard();
+              setWinDisplay("");
+              win.current = false;
+            }}>Reset</Button>      
+        )}
+      </div>
 
       <Dialog
-        open={false}
+        open={showModal}
         disableEscapeKeyDown
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -360,12 +411,42 @@ export default function Game() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => {
-            createGameBoardModel();
-            createGameBoard();
-            setWinDisplay("");
-            win.current = false;
+            setShowModal(false);
           }} color="primary">
-            Restart
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={showPlayersModal}
+        disableEscapeKeyDown
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Select 1 or 2 players.
+          <select onChange={(e) => {
+            if (e.target.value === "1") {
+              setIsOnePlayer(true);
+            } else if (e.target.value === "2") {
+              setIsOnePlayer(false);
+            }
+          }}>
+            <option>-</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setShowPlayersModal(false);
+          }} color="primary">
+            Done
           </Button>
         </DialogActions>
       </Dialog>
