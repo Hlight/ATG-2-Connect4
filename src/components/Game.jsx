@@ -298,6 +298,7 @@ export default function Game() {
       }
     }
     win.current = true;
+    console.log("line 301 win.current: "+win.current)
     setShowModal(true);
     setWinDisplay(
       <div className={classNames("winner", {
@@ -338,39 +339,355 @@ export default function Game() {
     }
    };
 
-  // computer player logic (pretty dumb atm)
+  const getPotentialWinsVertical = (player) => {
+    console.log("getPotentialWinsVertical")
+    let x = 0; 
+    let y=0; 
+    let potentialWin=0; 
+    let potentialWins=[];
+    while (true) {
+      if (model.current[x][y] === player) {
+        potentialWin += 1;
+        if (potentialWin === 3) {
+          if (model.current[x][y+1] === 0) {
+            potentialWins.push(x, y+1);
+          }
+        }
+      } else {
+        potentialWin = 0;
+      }
+      y++;
+      if (y === 6) {
+        y=0;
+        x++;
+        if (x === 7) {
+          break;
+        }
+      }
+    }
+    console.log(potentialWins)
+    return potentialWins;
+  };
+  const getPotentialWinsHorizontal = (player) => {
+    console.log("getPotentialWinsHorizontal")
+    let x=0; 
+    let y=0; 
+    let potentialWin=0; 
+    let potentialWins=[];
+    while (true) {
+      if (model.current[x][y] === player) {
+        potentialWin += 1;
+        if (potentialWin === 3) {
+          if (
+            // next column over is open
+            x+1!==7 && model.current[x+1][y] === 0
+           ) {
+              // next slot under is taken too
+              // ensures the potential win is playable on next turn
+              if (y>0 && model.current[x+1][y-1] !== 0) {
+                potentialWins.push(x+1, y);
+              } else if (y === 0) {
+                potentialWins.push(x+1, y);
+              }
+          }
+          if (
+            // previous column to 3x potential win is open
+            (x+1)-4>=0 && model.current[(x+1)-4][y] === 0
+          ) {
+            // previus col slot under avail is also taken
+            // ensures the potential win is playable on next turn
+            if (y>0 && model.current[(x+1)-4][y-1] !== 0) {
+              potentialWins.push((x+1)-4, y);
+            } else if (y === 0) {
+              potentialWins.push((x+1)-4, y);
+            }
+          }
+        }
+      } else {
+        potentialWin = 0;
+      }
+      x++;
+      if (x === 7) {
+        y++;
+        x=0;
+        if (y === 6) {
+          break;
+        }
+      }
+    }
+    console.log(potentialWins)
+    return potentialWins;
+  };
+  const getPotentialWinsDiagonalUp = (player) => {
+    console.log("getPotentialWinsDiagonalUp")
+    let x=0; 
+    let y=0; 
+    let potentialWin=0; 
+    let potentialWins=[];
+    while (true) {
+      if (model.current[x][y] === player) {
+        console.log(`model.current[${x}][${y}] === ${player} ${true}`)
+        potentialWin += 1;
+
+        console.log(`x=${x}`)
+        console.log(`y=${y}`)
+        if (x+1<7 && y+1<6 && model.current[x+1][y+1] === player) {
+          console.log(`x+1<7 && y+1<6 && model.current[${x+1}][${y+1}] === ${player} ${true}`)
+          potentialWin += 1;
+        } else { potentialWin = 0; }
+
+        if (x+2<7 && y+2<6 && model.current[x+2][y+2] === player) {
+          console.log(`x+2<7 && y+2<6 && model.current[${x+2}][${y+2}] === ${player} ${true}`)
+          potentialWin += 1;
+        } else { potentialWin = 0; }
+
+        if (potentialWin === 3) {
+          potentialWin = 0;
+          
+          console.log(`> potentialWin === 3
+> x+3<7 && y+3<6 && model.current[x+3][y+3] === 0 &&
+> // playable i.e. slot below taken
+model.current[x+3][y+2] !== 0 ${x+3<7 && y+3<6 && model.current[x+3][y+3] === 0 &&
+            // playable i.e. slot below taken
+            model.current[x+3][y+2] !== 0}
+>>>`)
+        
+          // # next slot
+          if (
+            // next diagonal up slot is open and..
+            x+3<7 && y+3<6 && model.current[x+3][y+3] === 0 &&
+            // playable i.e. slot below taken
+            model.current[x+3][y+2] !== 0
+          ) {
+            potentialWins.push(x+3, y+3);
+          }
+          
+          // # prev slot
+          if (
+            // prev diagonal down slot is open and playable
+            x>0 && y>0 && model.current[x-1][y-1] === 0
+          ) {
+            console.log(`prev slot
+x>0 && y>0 && model.current[x-1][y-1] === 0 ${true}`)
+            if (
+              // higher up, check slot below to be taken
+              // ensures prev diag down slot playable
+              y>1 && model.current[x-1][y-2] !== 0
+            ) {
+              potentialWins.push(x-1, y-1);
+            } else if (y-1 === 0) {
+              potentialWins.push(x-1, y-1);
+            }
+          }
+        }
+      } else {
+        potentialWin = 0;
+      }
+      x++;
+      // potential diagonal up requires at least three slots
+      if (x === 7) {
+        y++;
+        x=0;
+      }
+      // potential diagonal up requires at least three slots
+      if (y === 6) {
+        break;
+      }
+    }
+    console.log(potentialWins)
+    return potentialWins;
+  };
+  const getPotentialWinsDiagonalDown = (player) => {
+    console.log("getPotentialWinsDiagonalDown")
+    let x=0; 
+    let y=2; // diagDown needs y height
+    let potentialWin=0; 
+    let potentialWins=[];
+    while (true) {
+      if (model.current[x][y] === player) {
+        console.log(`x=${x}`)
+        console.log(`y=${y}`)
+        console.log(`model.current[${x}][${y}] === ${player} ${true}`)
+        potentialWin += 1;
+        if (x+1<7 && y-1>=0 && model.current[x+1][y-1] === player) {
+          console.log(`x+1<7 && y-1>=0 && model.current[${x+1}][${y-1}] === ${player} ${true}`)
+          potentialWin += 1;
+        } else { potentialWin = 0; }
+        if (x+2<7 && y-2>=0 && model.current[x+2][y-2] === player) {
+          console.log(`x+2<7 && y-2>=0 && model.current[${x+2}][${y-2}] === ${player} ${true}`)
+          potentialWin += 1;
+        } else { potentialWin = 0; }
+        if (potentialWin === 3) {
+          potentialWin = 0;
+          console.log(`> potentialWin === 3
+> NEXT SLOT: x+3<7 && y-3>=0 && model.current[x+3][y-3] === 0 ${x+3<7 && y-3>=0 && model.current[x+3][y-3] === 0}
+> PREV SLOT: x>0 && model.current[x-1][y+1] === 0 ${x>0 && model.current[x-1][y+1] === 0}`)
+          // # next slot
+          if (
+            // next diagonal down slot is open and..
+            x+3<7 && y-3>=0 && model.current[x+3][y-3] === 0 
+          ) {
+            // if y-4>=0 check if playable i.e. slot below taken
+            if (y-4>=0 && model.current[x+3][y-4] !== 0) {
+              potentialWins.push(x+3, y-3);  
+            } else if (y-3===0) {
+              potentialWins.push(x+3, y-3);
+            }
+            
+          }
+          // # prev slot
+          if (
+            // prev diagonal down slot is open and playable
+            x>0 && model.current[x-1][y+1] === 0
+          ) {
+            if (
+              // higher up, check slot below to be taken
+              // ensures prev diag down slot playable
+              model.current[x-1][y] !== 0
+            ) {
+              potentialWins.push(x-1, y+1);
+            }
+          }
+        }
+        
+      } else {
+        potentialWin = 0;
+      }
+      x++;
+      // potential diagonal down requires at least three slots
+      if (x === 7) {
+        y++;
+        x=0;
+      }
+      // potential diagonal down requires at least three slots
+      if (y === 6) {
+        break;
+      }
+    }
+    console.log(potentialWins)
+    return potentialWins;
+  };
+  // Get Computer Smart Turn
+  // not really that smart, attempting
+  const getComputerSmartTurn = (player) => {
+    let x=0;
+    let y=0;
+    let potentialPlays = 0;
+    let potentials = [];
+    let forwardsPlays = 0;
+    let backwardsPlays = 0;
+    while (true) {
+      if (model.current[x][y] === player || model.current[x][y] === 1) {
+        potentialPlays += 1;
+        // check horizontal forwards
+        if (x+1<7 && model.current[x+1][y] === 0) {
+          forwardsPlays += 1;
+        }
+        if (x+2<7 && model.current[x+2][y] === 0) {
+          forwardsPlays += 1;
+        }
+        if (x+3<7 && model.current[x+3][y] === 0) {
+          forwardsPlays += 1;
+        }
+        // check horizontal backwards
+        if (x-1>=0 && model.current[x-1][y] === 0) {
+          backwardsPlays += 1;
+        }
+        if (x-2>=0 && model.current[x-2][y] === 0) {
+          backwardsPlays += 1;
+        }
+        if (x-3>=0 && model.current[x-3][y] === 0) {
+          backwardsPlays += 1;
+        }
+        if (potentialPlays + forwardsPlays >= 4) {
+          if (forwardsPlays) {
+            potentials.push(x+1,y);
+          }
+          if (backwardsPlays) {
+            potentials.push(x-1,y);
+          }
+        }
+      } else {
+        potentialPlays = 0;
+        backwardsPlays = 0;
+        forwardsPlays = 0;
+      }
+      x++;
+      if (x === 7) {
+        x=0;
+        y++;
+        if (y === 6) {
+          break;
+        }
+      }
+    }// <-end while
+    console.log("getComputerSmartTurn: " + potentials.toString())
+    return potentials;
+  };
+  const getComputerTurn = () => {
+    let xCoord = Math.floor(Math.random() * 6);
+    let yCoord = Math.floor(Math.random() * 5);
+    for (let x=0; x<7; x++) {
+      for (let y=0; y<6; y++) {
+        if (model.current[x][y] === 2) {
+          xCoord = x;
+          yCoord = y;
+          
+          if (x-1!==-1 && model.current[x-1][y] === 0) {
+            xCoord = x-1;
+          } 
+          if (y-1!==-1 && model.current[x][y-1] === 0) {
+            yCoord = y-1;
+          }
+          if (x+1!==7 && model.current[x+1][y] === 0) {
+            xCoord = x+1;
+          }
+          if (y+1!==6 && model.current[x][y+1] === 0) {
+            yCoord = y+1;
+          }
+        } 
+      }
+    }
+    return [xCoord, yCoord];
+  };
+  // computer player logic (still a bit dumb but better)
   useEffect(() => {
     if (isOnePlayer && turn.current === 2) {
-      let xCoord = Math.floor(Math.random() * 6);
-      let yCoord = Math.floor(Math.random() * 5);
-      for (let x=0; x<7; x++) {
-        for (let y=0; y<6; y++) {
-          if (model.current[x][y] === 2) {
-            xCoord = x;
-            yCoord = y;
-            
-            if (x-1!==-1 && model.current[x-1][y] === 0) {
-              xCoord = x-1;
-            } 
-            if (y-1!==-1 && model.current[x][y-1] === 0) {
-              yCoord = y-1;
-            }
-            if (x+1!==7 && model.current[x+1][y] === 0) {
-              xCoord = x+1;
-            }
-            if (y+1!==6 && model.current[x][y+1] === 0) {
-              yCoord = y+1;
-            }
-          } 
-        }
+      let xCoord;
+      let yCoord;
+      // check vertical potential opponent wins
+      let potentialWins = [];
+      // get player 2 potentials to seal the deal for computer
+      potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
+      potentialWins = [...getPotentialWinsHorizontal(2), ...potentialWins];
+      potentialWins = [...getPotentialWinsDiagonalUp(2), ...potentialWins];
+      potentialWins = [...getPotentialWinsDiagonalDown(2), ...potentialWins];
+      // if player 1 has potentials block them so putting this after player 2 above
+      potentialWins = [...getPotentialWinsVertical(1),...potentialWins];
+      potentialWins = [...getPotentialWinsHorizontal(1),...potentialWins];
+      potentialWins = [...getPotentialWinsDiagonalUp(1),...potentialWins];
+      potentialWins = [...getPotentialWinsDiagonalDown(1),...potentialWins];
+      
+      console.log("potentialWins: "+potentialWins)
+
+      const smarterTurn = []//getComputerSmartTurn(2);
+
+      if (potentialWins.length) {
+        xCoord = potentialWins[0];
+        yCoord = potentialWins[1];
+      } else if (smarterTurn.length) {
+        xCoord = smarterTurn[0];
+        yCoord = smarterTurn[1];
+      } else {
+        const computerTurn = getComputerTurn();
+        xCoord = computerTurn[0];
+        yCoord = computerTurn[1];
       }
       dropper([xCoord,yCoord]);
       console.log("computer turn!");
     }
   }, [turn.current]);
 
-  
-  
   return (
     <>
       <div className="score">
@@ -382,7 +699,8 @@ export default function Game() {
         "is-win": win.current
       })}>{board}</div>
       <div className="win-reset">
-        {win.current && (
+        {//win.current && (
+          true && (
           <Button
             variant="contained"
             className="btn-reset"
