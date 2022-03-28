@@ -695,12 +695,13 @@ x>0 && y>0 && model.current[x-1][y-1] === 0 ${true}`)
         Black: {score.current.player2}
       </div>
 
+      <div className="current-turn">
+        {turn.current === 2 ? "Black" : "Red"}'s Turn</div>
+
       <div className={classNames("game", {
         "is-win": win.current
       })}>{board}</div>
       <div className="win-reset">
-        {//win.current && (
-          true && (
           <Button
             variant="contained"
             className="btn-reset"
@@ -710,9 +711,9 @@ x>0 && y>0 && model.current[x-1][y-1] === 0 ${true}`)
               setWinDisplay("");
               win.current = false;
             }}>Reset</Button>      
-        )}
       </div>
 
+      {/* dialogs can be moved to their own components */}
       <Dialog
         open={showModal}
         disableEscapeKeyDown
@@ -728,9 +729,7 @@ x>0 && y>0 && model.current[x-1][y-1] === 0 ${true}`)
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => {
-            setShowModal(false);
-          }} color="primary">
+          <Button onClick={() => setShowModal(false)} color="primary">
             Close
           </Button>
         </DialogActions>

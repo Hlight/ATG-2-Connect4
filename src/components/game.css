@@ -80,3 +80,8 @@ select.player-select {
   width: 100%;
   font-size: 120%;
 }
+
+.current-turn {
+  position: absolute;
+  top: 5px;
+}
