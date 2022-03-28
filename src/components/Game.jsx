@@ -743,21 +743,15 @@ x>0 && y>0 && model.current[x-1][y-1] === 0 ${true}`)
       >
         <DialogTitle id="alert-dialog-title">
           Select 1 or 2 players.
-          <select onChange={(e) => {
-            if (e.target.value === "1") {
-              setIsOnePlayer(true);
-            } else if (e.target.value === "2") {
-              setIsOnePlayer(false);
-            }
-          }}>
-            <option>-</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-
+            <select onChange={(e) =>
+              setIsOnePlayer(e.target.value === "1")} className="player-select">
+              
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+            </select>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
