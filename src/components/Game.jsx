@@ -44,8 +44,6 @@ export default function Game() {
   // Game a game board of components to display the board.
   const createGameBoard = () => {
     const [x1,y1,x2,y2,x3,y3,x4,y4] = winningSlots;
-    console.log("createGameBoard: winningSlots")
-    console.log(winningSlots)
     const newBoard = [];
     for (let i = 0; i < 7; i++) {
       const newColumn = [];
@@ -55,17 +53,7 @@ export default function Game() {
           (x2==i&&y2==j) || 
           (x3==i&&y3==j) || 
           (x4==i&&y4==j);
-        if (isWinner) {
-        console.log(`
-const isWinner = 
-          (${x1}==${i}&&${y1}==${j}) || 
-          (${x2}==${i}&&${y2}==${j}) || 
-          (${x3}==${i}&&${y3}==${j}) || 
-          (${x4}==${i}&&${y4}==${j});`)
-        console.log(isWinner)
-          console.log(isWinner ? " win" : "")
-          
-        }
+
         const NewSlot = (
           <Slot 
             player={model.current[i][j]} 
@@ -94,12 +82,6 @@ const isWinner =
     createGameBoard();
   }, [winningSlots])
 
-  const highlightWinningSlots = coordinates => {
-    // const [x1,y1,x2,y2,x3,y3,x4,y4] = coordinates;
-    // console.log(x1, y1, x2, y2, x3, y3,x4,y4)
-    // console.log(board)
-    setWinningSlots(coordinates);
-  };
   /**
     [
       [1, 1, 1, 1, 0, 0],
@@ -138,7 +120,7 @@ const isWinner =
         );
         // console.log("winTracker: "+winTracker)
         if (winTracker === 4) {
-          highlightWinningSlots(slotCoordinates);
+          setWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -191,7 +173,7 @@ const isWinner =
           coordinates[1]
         );
         if (winTracker === 4){
-          highlightWinningSlots(slotCoordinates);
+          setWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -256,7 +238,7 @@ const isWinner =
         winTracker += 1;
         // console.log("winTracker", winTracker)
         if (winTracker === 4) {
-          highlightWinningSlots(slotCoordinates);
+          setWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -315,7 +297,7 @@ const isWinner =
         );
         winTracker += 1
         if (winTracker === 4) {
-          highlightWinningSlots(slotCoordinates);
+          setWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -658,9 +640,9 @@ const isWinner =
     let y=0;
     let potentialWins=[];
     while (true) {
-      console.log("while(true)...")
-      console.log("x: "+x)
-      console.log("y: "+y)
+      // console.log("while(true)...")
+      // console.log("x: "+x)
+      // console.log("y: "+y)
       if (model.current[x][y] === player &&
          x+1<7 && y-1>=0 && model.current[x+1][y-1] === player &&
           x+2<7 && y-2>=0 && model.current[x+2][y-2] === player
@@ -672,7 +654,7 @@ const isWinner =
           ) {
             // if y-4>=0 check if playable i.e. slot below taken
             if (y-4>=0 && model.current[x+3][y-4] !== 0) {
-            console.log("next slot available & playable")
+            // console.log("next slot available & playable")
               
               potentialWins.push(x+3, y-3);  
             } else if (y-3===0) {
@@ -690,7 +672,7 @@ const isWinner =
               // ensures prev diag down slot playable
               model.current[x-1][y] !== 0
             ) {
-              console.log("prev slot available & playable")
+              // console.log("prev slot available & playable")
               potentialWins.push(x-1, y+1);
             }
           } 
@@ -799,8 +781,7 @@ const isWinner =
       let yCoord;
       // check vertical potential opponent wins
       let potentialWins = [];
-      // switch (Math.floor(Math.random() * 3)) {
-      switch (3) {
+      switch (Math.floor(Math.random() * 3)) {
         case 0: 
             // get player 1 two in a row to block in case no other potentials
             potentialWins = [...getTwoInARowHorizontal(1), ...potentialWins];
@@ -817,18 +798,17 @@ const isWinner =
   
       
       // get player 2 potentials to seal the deal for computer
-      // potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
+      potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
       potentialWins = [...getPotentialWinsHorizontal(2), ...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalUp(2), ...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalDown(2), ...potentialWins];
       // if player 1 has potentials block them so putting this after player 2 above
-      // potentialWins = [...getPotentialWinsVertical(1),...potentialWins];
+      potentialWins = [...getPotentialWinsVertical(1),...potentialWins];
       potentialWins = [...getPotentialWinsHorizontal(1),...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalUp(1),...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalDown(1),...potentialWins];
       
       console.log("potentialWins: "+potentialWins)
-      console.log("potentialWins.length: "+potentialWins.length)
 
       const smarterTurn = []//getComputerSmartTurn(2);
 

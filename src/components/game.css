@@ -40,23 +40,26 @@
 
 .player1 {
   background-color: rgb(191,	61,	54);
-  outline: 5px solid red;
-  outline-offset: -13px;
 }
 .player1.slot:hover {
   background-color: rgb(191,	61,	54);
 }
 .slot.win {
-  border: 3px solid white;
+/*   border: 3px solid white; */
   animation: flip; /* referring directly to the animation's @keyframe declaration */
   animation-duration: 2s; 
   animation-iteration-count: 5;
 }
-
+.slot.win.player1 {
+  outline: 5px solid red;
+  outline-offset: -13px;
+}
+.slot.win.player2 {
+  outline: 5px solid #6d96ab;
+  outline-offset: -13px;
+}
 .player2 {
     background-color: #1b262c;
-    outline: 5px solid #6d96ab;
-    outline-offset: -13px;
 }
 .player2.slot:hover {
     background-color: #1b262c;
