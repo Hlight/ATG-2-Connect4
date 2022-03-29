@@ -358,16 +358,44 @@ export default function Game() {
         // no prev slot on vertical win
       }
       y++;
-      if (y === 6) {
+      if (y >= 6) {
         y=0;
         x++;
-        if (x === 7) {
+        if (x >= 7) {
           break;
         }
       }
     }
     console.log(potentialWins)
     return potentialWins;
+  };
+  const getTwoInARowVertical = player => {
+    console.log("getTwoInARowVertical")
+    let x=0; 
+    let y=0; 
+    let potentialWins=[];
+    while (true) {
+      if (
+        model.current[x][y] === player &&
+        (y+1!==6 && model.current[x][y+1] === player)
+      ) {
+        // next slot is available
+        if (y+2!==6 && model.current[x][y+2] === 0) {
+          potentialWins.push(x, y+2);
+        }
+        // no prev slot on vertical win
+      }
+      y++;
+      if (y >= 6) {
+        y=0;
+        x++;
+        if (x >= 7) {
+          break;
+        }
+      }
+    }
+    console.log(potentialWins)
+    return potentialWins;    
   };
   const getPotentialWinsHorizontal = (player) => {
     console.log("getPotentialWinsHorizontal")
@@ -435,10 +463,10 @@ export default function Game() {
         }
       }
       x++;
-      if (x === 7) {
+      if (x >= 7) {
         y++;
         x=0;
-        if (y === 6) {
+        if (y >= 6) {
           break;
         }
       }
@@ -475,10 +503,10 @@ export default function Game() {
         }
       }
       x++;
-      if (x === 7) {
+      if (x >= 7) {
         y++;
         x=0;
-        if (y === 6) {
+        if (y >= 6) {
           break;
         }
       }
@@ -551,12 +579,12 @@ export default function Game() {
       }
       x++;
       // potential diagonal up requires at least three slots
-      if (x === 7) {
+      if (x >= 7) {
         y++;
         x=0;
       }
       // potential diagonal up requires at least three slots
-      if (y === 6) {
+      if (y >= 6) {
         break;
       }
     }
@@ -605,12 +633,12 @@ export default function Game() {
       }
       x++;
       // potential diagonal down requires at least three slots
-      if (x === 7) {
+      if (x >= 7) {
         y++;
         x=0;
       }
       // potential diagonal down requires at least three slots
-      if (y === 6) {
+      if (y >= 6) {
         break;
       }
     }
@@ -709,6 +737,7 @@ export default function Game() {
       let potentialWins = [];
       // get player 1 two in a row to block in case no other potentials
       potentialWins = [...getTwoInARowHorizontal(1), ...potentialWins];
+      potentialWins = [...getTwoInARowVertical(1), ...potentialWins];
       // get player 2 potentials to seal the deal for computer
       potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
       potentialWins = [...getPotentialWinsHorizontal(2), ...potentialWins];
