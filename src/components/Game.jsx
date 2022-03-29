@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import classNames from "classnames";
 import "./game.css";
+import "animate.css";
 
 export default function Game() {
   const [board, setBoard] = useState([]);
@@ -19,6 +20,7 @@ export default function Game() {
   const [showModal, setShowModal] = useState(false);
   const [isOnePlayer, setIsOnePlayer] = useState(false);
   const [showPlayersModal, setShowPlayersModal] = useState(true);
+  const [winningSlots, setWinningSlots] = useState([]);
   
   const model = useRef(null);
   const turn = useRef(1);
@@ -41,16 +43,36 @@ export default function Game() {
 
   // Game a game board of components to display the board.
   const createGameBoard = () => {
+    const [x1,y1,x2,y2,x3,y3,x4,y4] = winningSlots;
+    console.log("createGameBoard: winningSlots")
+    console.log(winningSlots)
     const newBoard = [];
     for (let i = 0; i < 7; i++) {
       const newColumn = [];
       for (let j=0; j < 6; j++) {
+        const isWinner = 
+          (x1==i&&y1==j) || 
+          (x2==i&&y2==j) || 
+          (x3==i&&y3==j) || 
+          (x4==i&&y4==j);
+        if (isWinner) {
+        console.log(`
+const isWinner = 
+          (${x1}==${i}&&${y1}==${j}) || 
+          (${x2}==${i}&&${y2}==${j}) || 
+          (${x3}==${i}&&${y3}==${j}) || 
+          (${x4}==${i}&&${y4}==${j});`)
+        console.log(isWinner)
+          console.log(isWinner ? " win" : "")
+          
+        }
         const NewSlot = (
           <Slot 
             player={model.current[i][j]} 
             dropper={dropper} 
             coordinates={[i,j]}
-            key={`slot-${i}${j}`} 
+            key={`slot-${i}${j}`}
+            className={isWinner ? " win" : ""}
           />
         );
         newColumn.push(NewSlot);
@@ -67,7 +89,17 @@ export default function Game() {
     createGameBoardModel();
     createGameBoard();
   }, []);
+  
+  useEffect(() => {
+    createGameBoard();
+  }, [winningSlots])
 
+  const highlightWinningSlots = coordinates => {
+    // const [x1,y1,x2,y2,x3,y3,x4,y4] = coordinates;
+    // console.log(x1, y1, x2, y2, x3, y3,x4,y4)
+    // console.log(board)
+    setWinningSlots(coordinates);
+  };
   /**
     [
       [1, 1, 1, 1, 0, 0],
@@ -93,14 +125,20 @@ export default function Game() {
 
     let backwardsCounter = 0;
     let winTracker = 0;
+    const slotCoordinates = [];
     while (true) {
       const vertCoords = 
         model.current[coordinates[0]][coordinates[1] + counter - backwardsCounter];
       // console.log(`model.current[${coordinates[0]}][${coordinates[1]} + ${counter} - ${backwardsCounter}]`)
       if (vertCoords === player) {
         winTracker += 1;
+        slotCoordinates.push(
+          coordinates[0],
+          coordinates[1] + counter - backwardsCounter
+        );
         // console.log("winTracker: "+winTracker)
         if (winTracker === 4) {
+          highlightWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -141,13 +179,19 @@ export default function Game() {
   
     let backwardsCounter = 0
     let winTracker = 0
+    const slotCoordinates = [];
     while (true) {
       if (
         model.current[coordinates[0] + counter - backwardsCounter]
        [coordinates[1]] === player
       ) {
-        winTracker += 1
+        winTracker += 1;
+        slotCoordinates.push(
+          coordinates[0] + counter - backwardsCounter,
+          coordinates[1]
+        );
         if (winTracker === 4){
+          highlightWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -195,6 +239,7 @@ export default function Game() {
 
     let backwardsCounter = 0;
     let winTracker = 0;
+    const slotCoordinates = [];
     while (true) {
       const diagonalUpCoordinates =
         model.current[coordinates[0] + counter - backwardsCounter]
@@ -204,9 +249,14 @@ export default function Game() {
       if (
         diagonalUpCoordinates === player
       ) {
+        slotCoordinates.push(
+          coordinates[0] + counter - backwardsCounter,
+          coordinates[1] + counter - backwardsCounter
+        );
         winTracker += 1;
         // console.log("winTracker", winTracker)
         if (winTracker === 4) {
+          highlightWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -251,15 +301,21 @@ export default function Game() {
     }
 
     let backwardsCounter = 0
-    let winTracker = 0
+    let winTracker = 0;
+    const slotCoordinates = [];
     while(true){
       if (
         model.current[coordinates[0] + 
         counter - backwardsCounter][coordinates[1] -
         counter + backwardsCounter] === player
       ) {
+        slotCoordinates.push(
+          coordinates[0] + counter - backwardsCounter,
+          coordinates[1] - counter + backwardsCounter
+        );
         winTracker += 1
         if (winTracker === 4) {
+          highlightWinningSlots(slotCoordinates);
           return true
         }
       } else {
@@ -283,6 +339,8 @@ export default function Game() {
   };
 
   const executeWin = player => {
+    createGameBoard();    
+    
     let playerText = "";
     if (player === 1) {
       playerText = "Red";
@@ -339,6 +397,9 @@ export default function Game() {
     }
    };
 
+  /*
+    Computer Player Logic
+  */
   const getPotentialWinsVertical = (player) => {
     console.log("getPotentialWinsVertical")
     let x=0; 
@@ -579,12 +640,12 @@ export default function Game() {
       }
       x++;
       // potential diagonal up requires at least three slots
-      if (x >= 7) {
+      if (x === 7) {
         y++;
         x=0;
       }
       // potential diagonal up requires at least three slots
-      if (y >= 6) {
+      if (y === 6) {
         break;
       }
     }
@@ -594,13 +655,16 @@ export default function Game() {
   const getPotentialWinsDiagonalDown = (player) => {
     console.log("getPotentialWinsDiagonalDown")
     let x=0; 
-    let y=2; // diagDown needs y height
+    let y=0;
     let potentialWins=[];
     while (true) {
+      console.log("while(true)...")
+      console.log("x: "+x)
+      console.log("y: "+y)
       if (model.current[x][y] === player &&
          x+1<7 && y-1>=0 && model.current[x+1][y-1] === player &&
           x+2<7 && y-2>=0 && model.current[x+2][y-2] === player
-         ) {       
+         ) {
           // # next slot
           if (
             // next diagonal down slot is open and..
@@ -633,12 +697,12 @@ export default function Game() {
       }
       x++;
       // potential diagonal down requires at least three slots
-      if (x >= 7) {
+      if (x === 7) {
         y++;
         x=0;
       }
       // potential diagonal down requires at least three slots
-      if (y >= 6) {
+      if (y === 6) {
         break;
       }
     }
@@ -717,10 +781,10 @@ export default function Game() {
           if (y-1!==-1 && model.current[x][y-1] === 0) {
             yCoord = y-1;
           }
-          if (x+1!==7 && model.current[x+1][y] === 0) {
+          if (x+1<7 && model.current[x+1][y] === 0) {
             xCoord = x+1;
           }
-          if (y+1!==6 && model.current[x][y+1] === 0) {
+          if (y+1<6 && model.current[x][y+1] === 0) {
             yCoord = y+1;
           }
         } 
@@ -735,21 +799,36 @@ export default function Game() {
       let yCoord;
       // check vertical potential opponent wins
       let potentialWins = [];
-      // get player 1 two in a row to block in case no other potentials
-      potentialWins = [...getTwoInARowHorizontal(1), ...potentialWins];
-      potentialWins = [...getTwoInARowVertical(1), ...potentialWins];
+      // switch (Math.floor(Math.random() * 3)) {
+      switch (3) {
+        case 0: 
+            // get player 1 two in a row to block in case no other potentials
+            potentialWins = [...getTwoInARowHorizontal(1), ...potentialWins];
+          break;
+        case 1:
+          potentialWins = [...getTwoInARowVertical(1), ...potentialWins];
+          break;
+        case 2:
+          potentialWins = [...getTwoInARowHorizontal(1), ...potentialWins];
+          potentialWins = [...getTwoInARowVertical(1), ...potentialWins];
+          break;
+        default:
+      }
+  
+      
       // get player 2 potentials to seal the deal for computer
-      potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
+      // potentialWins = [...getPotentialWinsVertical(2), ...potentialWins];
       potentialWins = [...getPotentialWinsHorizontal(2), ...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalUp(2), ...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalDown(2), ...potentialWins];
       // if player 1 has potentials block them so putting this after player 2 above
-      potentialWins = [...getPotentialWinsVertical(1),...potentialWins];
+      // potentialWins = [...getPotentialWinsVertical(1),...potentialWins];
       potentialWins = [...getPotentialWinsHorizontal(1),...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalUp(1),...potentialWins];
       potentialWins = [...getPotentialWinsDiagonalDown(1),...potentialWins];
       
       console.log("potentialWins: "+potentialWins)
+      console.log("potentialWins.length: "+potentialWins.length)
 
       const smarterTurn = []//getComputerSmartTurn(2);
 
@@ -787,6 +866,7 @@ export default function Game() {
             variant="contained"
             className="btn-reset"
             onClick={() => {
+              setWinningSlots([]);
               createGameBoardModel();
               createGameBoard();
               setWinDisplay("");
