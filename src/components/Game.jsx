@@ -459,9 +459,7 @@ export default function Game() {
          ) {
             // next slot under is taken too
             // ensures the potential win is playable on next turn
-            if (y>0 && model.current[x+3][y-1] !== 0) {
-              potentialWins.push(x+3, y);
-            } else if (y === 0) {
+            if ((y>0 && model.current[x+3][y-1] !== 0) || (y === 0)) {
               potentialWins.push(x+3, y);
             }
         }
@@ -640,7 +638,7 @@ export default function Game() {
     let y=0;
     let potentialWins=[];
     while (true) {
-      // console.log("while(true)...")
+      console.log("while(true)...")
       // console.log("x: "+x)
       // console.log("y: "+y)
       if (model.current[x][y] === player &&
@@ -652,13 +650,13 @@ export default function Game() {
             // next diagonal down slot is open and..
             x+3<7 && y-3>=0 && model.current[x+3][y-3] === 0 
           ) {
-            // if y-4>=0 check if playable i.e. slot below taken
-            if (y-4>=0 && model.current[x+3][y-4] !== 0) {
-            // console.log("next slot available & playable")
-              
+            if (
+              // if y-4>=0 check if playable i.e. slot below taken
+              (y-4>=0 && model.current[x+3][y-4] !== 0) ||
+              (y-3===0)
+             ) {
+            console.log("next slot available & playable")              
               potentialWins.push(x+3, y-3);  
-            } else if (y-3===0) {
-              potentialWins.push(x+3, y-3);
             }
             
           }
@@ -672,7 +670,7 @@ export default function Game() {
               // ensures prev diag down slot playable
               model.current[x-1][y] !== 0
             ) {
-              // console.log("prev slot available & playable")
+              console.log("prev slot available & playable")
               potentialWins.push(x-1, y+1);
             }
           } 
