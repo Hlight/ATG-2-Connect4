@@ -11,7 +11,7 @@ import {
 export default ({ 
   showPlayersModal,
   setShowPlayersModal, 
-  setIsOnePlayer 
+  isOnePlayer 
 }) => (
   <Dialog
     open={showPlayersModal}
@@ -24,9 +24,11 @@ export default ({
     </DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-description">
-        <select onChange={(e) =>
-          setIsOnePlayer(e.target.value === "1")} className="player-select">
-          
+        <select 
+          onChange={(e) =>
+          isOnePlayer.current = (e.target.value === "1")} 
+          className="player-select"
+        >
           <option value="1">1</option>
           <option value="2" selected>2</option>
         </select>

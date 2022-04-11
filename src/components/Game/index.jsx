@@ -19,10 +19,8 @@ import "animate.css";
 
 export default function Game() {
   const [board, setBoard] = useState([]);
-  const [started, setStarted] = useState(false);
   const [winDisplay, setWinDisplay] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isOnePlayer, setIsOnePlayer] = useState(false);
   const [showPlayersModal, setShowPlayersModal] = useState(true);
   const [winningSlots, setWinningSlots] = useState([]);
   
@@ -30,6 +28,7 @@ export default function Game() {
   const turn = useRef(1);
   const win = useRef(false);
   const score = useRef({ player1: 0, player2: 0 });
+  const isOnePlayer = useRef(false);
 
   // Create a matrix to track our players moves.
   const createGameBoardModel = () => {
@@ -90,14 +89,14 @@ export default function Game() {
     let playerText = "";
     if (player === 1) {
       playerText = "Red";
-      if (!isOnePlayer) {
+      if (!isOnePlayer.current) {
         turn.current = turn.current === 1 ? 2 : 1;
       }
       score.current.player1 += 1;
     } else if (player === 2) {
       playerText = "Black";
       score.current.player2 += 1;
-      if (!isOnePlayer) {
+      if (!isOnePlayer.current) {
         turn.current = turn.current === 2 ? 1 : 2;
       }
     }
@@ -111,7 +110,7 @@ export default function Game() {
       })}>{`${playerText} Won the game! `}
       </div>
     );
-    if (isOnePlayer) {
+    if (isOnePlayer.current) {
       turn.current = 1;
     }
    };
@@ -169,7 +168,7 @@ export default function Game() {
     (computer player logic (still a bit dumb but better))
   */
   useEffect(() => {  
-    if (isOnePlayer && turn.current === 2) {
+    if (isOnePlayer.current && turn.current === 2) {
       playTurn({ model, dropper });      
     }
   }, [turn.current]);
@@ -203,7 +202,7 @@ export default function Game() {
       <DialogPlayers 
         showPlayersModal={showPlayersModal}
         setShowPlayersModal={setShowPlayersModal}
-        setIsOnePlayer={setIsOnePlayer}
+        isOnePlayer={isOnePlayer}
       />
     </>
   )
