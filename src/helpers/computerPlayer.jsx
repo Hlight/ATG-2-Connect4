@@ -15,21 +15,11 @@ export const playTurn = ({ model, dropper }) => {
   let yCoord;
   // check vertical potential opponent wins
   let potentialWins = [];
-  switch (Math.floor(Math.random() * 3)) {
-    case 0: 
-      // get player 1 two in a row to block in case no other potentials
-      potentialWins = [...getTwoInARowHorizontal(1,model), ...potentialWins];
-      break;
-    case 1:
-      potentialWins = [...getTwoInARowVertical(1,model), ...potentialWins];
-      break;
-    case 2:
-      potentialWins = [...getTwoInARowHorizontal(1, model), ...potentialWins];
-      potentialWins = [...getTwoInARowVertical(1, model), ...potentialWins];
-      break;
-    default:
-  }
 
+  // DISABLED 2-in-row vertical (not really useful)
+  // potentialWins = [...getTwoInARowVertical(1, model), ...potentialWins];
+  
+  potentialWins = [...getTwoInARowHorizontal(1,model), ...potentialWins];
   
   // get player 2 potentials to seal the deal for computer
   potentialWins = [...getPotentialWinsVertical(2, model), ...potentialWins];

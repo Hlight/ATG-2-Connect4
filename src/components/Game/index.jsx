@@ -174,6 +174,14 @@ export default function Game() {
     }
   }, [turn.current]);
 
+  const handleReset = () => {
+    setWinningSlots([]);
+    createGameBoardModel();
+    createGameBoard();
+    setWinDisplay('');
+    win.current = false;
+  };
+
   return (
     <>
       <Score score={score} />
@@ -185,13 +193,7 @@ export default function Game() {
         "is-win": win.current
       })}>{board}</div>
 
-      <ResetButton onClick={() => {
-				setWinningSlots([]);
-				createGameBoardModel();
-				createGameBoard();
-				setWinDisplay('');
-				win.current = false;
-			}} />
+      <ResetButton onClick={handleReset} />
 
       <DialogWinDisplay 
         showModal={showModal} 

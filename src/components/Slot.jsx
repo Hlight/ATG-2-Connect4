@@ -25,7 +25,6 @@ export default function Slot({
         props.onClick = handleClick;
         props.className = `${props.className} default`;
     }
-
     return <div {...props}></div>
   };
   
