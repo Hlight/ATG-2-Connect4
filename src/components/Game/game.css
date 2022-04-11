@@ -30,8 +30,9 @@
   border: 1px solid #4a66b8;
 }
 
-.slot:hover {
+.slot.default:hover {
   background-color: #fffefe;
+  cursor: pointer;
 }
 
 .game.is-win .slot {
@@ -83,6 +84,7 @@
   left: 1rem;
   border: 1px solid black;
   padding: 1rem;
+  pointer-events: none;
 }
 
 .btn-reset {

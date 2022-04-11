@@ -10,14 +10,23 @@ export default function Slot({
     dropper(coordinates);
   };
   const getSlot = () => {
+    const props = {
+      className: "slot",
+      onClick: null
+    };
     switch(player){
       case 1:
-        return <div className={`slot player1 ${className}`}></div>
+        props.className = `${props.className} player1 ${className}`;
+        break;
       case 2:
-        return <div className={`slot player2 ${className}`}></div>
+        props.className = `${props.className} player2 ${className}`;
+        break;
       default:
-        return <div onClick={handleClick} className="slot default">{/*coordinates[0]},{coordinates[1]*/}</div> 
+        props.onClick = handleClick;
+        props.className = `${props.className} default`;
     }
+
+    return <div {...props}></div>
   };
   
   return (
